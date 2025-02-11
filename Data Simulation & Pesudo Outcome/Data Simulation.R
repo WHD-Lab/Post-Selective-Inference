@@ -1,10 +1,12 @@
 # Data simulation function
-## The first function generate_individual simulates data for an individual participant
+## generate_individual: simulates data for an individual participant
 ## generate_dataset: simulates data for all participants
 
 generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_rand = 0.5, rho, beta_logit, model, beta, theta1) {
-  ## Generate an individual with T time points
-  ## Using parameter inputs above
+  ## Input: id, T, P (Dimension of state matrix), sigma_residual, sigma_randint, main_rand, rho (Correlation between time points), beta_logit, model, beta, theta1
+  ## Function: Generates an individual with T time points, including state (S_t), action (A_t), and outcome (Y_{t+1}) using ARIMA for states and logistic regression for actions.
+  ## Output: A data frame containing the generated states S_t, action A_t, outcomes Y_{t+1}, treatment effects, and noise components.
+  
   ## Order of generation: 
   ## (1) generate state S_t: VAR only depend on state
   ## (2) generate action A_t: depend on A_{t-1} and S_t, 
@@ -18,7 +20,7 @@ generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_
   current_action = 0
   for(t in 1:T) {
     current_states = all_states[t,]
-    if(t ==1) {current_action = 0} else{current_action = all_actions[t-1]}
+    if(t == 1) {current_action = 0} else{current_action = all_actions[t-1]}
     prob_action = 1/(1+exp(-c(current_action, current_states)%*%beta_logit)) ## Calculate probability of action at current time
     current_action = rbinom(n=1, size=1, prob = prob_action) ## Choose current action at time t
     all_probabilities[t] = prob_action
@@ -51,6 +53,7 @@ generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_
   return(df_individual)
 }
 
+
 generate_dataset <- function(N, T, P, sigma_residual, sigma_randint, main_rand = 0.5, rho, beta_logit, model, beta, theta1) {
   MRT_data = rep(0,0)
   for(n in 1:N) {
@@ -59,6 +62,7 @@ generate_dataset <- function(N, T, P, sigma_residual, sigma_randint, main_rand =
   }
   return(MRT_data)
 }
+
 
 
 
