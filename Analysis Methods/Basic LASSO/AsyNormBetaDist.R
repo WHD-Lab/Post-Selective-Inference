@@ -73,6 +73,20 @@ joint_dist = function(E, NE, pes_outcome, data, ej, id, time) {
               E = E,
               NE = NE
   ))
+  # Output:
+  # wt: ptSt * (1 - ptSt).
+  # betaEM: fitted model for selected predictors.
+  # S: ftStNE %*% residuals * wt / sqrt(n).
+  # ej: The j-th standard basis vector, used to extract a specific coefficient estimate from betaE.
+  # H: HEE, HNEE, HENE.
+  # K: KEE, KNEE, KNENE.
+  # Sigma: sigmaTT, sigmaST, sigmaSS.
+  # betaEj_cal: The estimated betaEj and the variance of betaEj.
+  # betaEperp_cal: betaEperp (orthogonal to betaE); sigma2 (Variance of betaEperp).
+  # betaEjperp_cal: betaEjperp (orthogonal to betaEj) ; sigma3 (Variance of betaEjperp).
+  # n: # of unique subjects in the dataset.
+  # E: selected predictors.
+  # NE: unselected predictors.
 }
 
 #############################################################################
@@ -156,6 +170,21 @@ joint_dist_Penal_Int = function(E, NE, pes_outcome, data, ej, id, time) {
               E = E,
               NE = NE
   ))
+  # Output:
+  # wt: ptSt * (1 - ptSt).
+  # betaEM: fitted model for selected predictors.
+  # S: ftStNE %*% residuals * wt / sqrt(n).
+  # ej: The j-th standard basis vector, used to extract a specific coefficient estimate from betaE.
+  # H: HEE, HNEE, HENE.
+  # K: KEE, KNEE, KNENE.
+  # Sigma: sigmaTT, sigmaST, sigmaSS.
+  # betaEj_cal: The estimated betaEj and the variance of betaEj.
+  # betaEperp_cal: betaEperp (orthogonal to betaE); sigma2 (Variance of betaEperp).
+  # betaEjperp_cal: betaEjperp (orthogonal to betaEj) ; sigma3 (Variance of betaEjperp).
+  # n: # of unique subjects in the dataset.
+  # E: selected predictors.
+  # NE: unselected predictors.
+  
 }
 
 

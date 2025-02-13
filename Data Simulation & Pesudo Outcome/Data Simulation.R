@@ -9,7 +9,7 @@ generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_
   
   ## Order of generation: 
   ## (1) generate state S_t: VAR only depend on state
-  ## (2) generate action A_t: depend on A_{t-1} and S_t, 
+  ## (2) generate action A_t: depend on A_{t-1} and S_t
   ## (3) generate outcome Y_{t+1}
   all_states = matrix(ncol = P, nrow = T)
   for(p in 1:P) {
@@ -61,6 +61,8 @@ generate_dataset <- function(N, T, P, sigma_residual, sigma_randint, main_rand =
     MRT_data = rbind(MRT_data,fake_individual)
   }
   return(MRT_data)
+  # Output:
+  # ID (1:N), Decision_point (1:T), state1 - stateP, prob, action, outcome (observed Y), signal (treatment_effect), noise
 }
 
 

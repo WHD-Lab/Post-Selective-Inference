@@ -2,7 +2,9 @@
 # detailed math can be found in manuscript Page 5
 
 PQR = function(joint_distcal, select_E) {
+  # Input:
   # joint_distcal: the result of function joint_dist
+  # select_E: the result of variable_selection (function variable_selection_PY)
   
   betaEjperp = joint_distcal[["betaEjperp_cal"]][["betaEjperp"]]
   betaEperp = joint_distcal[["betaEperp_cal"]][["betaEperp"]]
@@ -60,18 +62,28 @@ PQR = function(joint_distcal, select_E) {
               P = P,
               Q = Q,
               R = R,
-              Enum = Enum,# number of selected parameters
-              NEnum = NEnum, # number of unselected parameters
-              pnum = pnum, # number of all potential parameters
+              Enum = Enum,
+              NEnum = NEnum, 
+              pnum = pnum, 
               p1 = p1* sqrt(n),
               p4 = p4* sqrt(n),
               se = se))
+  
+  # Output:
+  # Enum: number of selected parameters
+  # NEnum: number of unselected parameters
+  # pnum: number of all potential parameters
+  # p1: HEE %*% sigmaTT %*% ej/c(t(ej) %*% sigmaTT %*% ej)
+  # p4: (sigmaST %*% ej + HNEE %*% sigmaTT %*% ej)/c(t(ej) %*% sigmaTT %*% ej)
+  # se: Signs of the estimated coefficients for selected variables.
 }
 
 ############################################################
 # PQR allow intercept being penalized
 PQR_Pint = function(joint_distcal, select_E) {
+  # Input:
   # joint_distcal: the result of function joint_dist
+  # select_E: the result of variable_selection (function variable_selection_PY)
   
   betaEjperp = joint_distcal[["betaEjperp_cal"]][["betaEjperp"]]
   betaEperp = joint_distcal[["betaEperp_cal"]][["betaEperp"]]
@@ -128,12 +140,21 @@ PQR_Pint = function(joint_distcal, select_E) {
               P = P,
               Q = Q,
               R = R,
-              Enum = Enum,# number of selected parameters
-              NEnum = NEnum, # number of unselected parameters
-              pnum = pnum, # number of all potential parameters
+              Enum = Enum,
+              NEnum = NEnum, 
+              pnum = pnum, 
               p1 = p1* sqrt(n),
               p4 = p4* sqrt(n),
               se = se))
+  
+  # Output:
+  # Enum: number of selected parameters
+  # NEnum: number of unselected parameters
+  # pnum: number of all potential parameters
+  # p1: HEE %*% sigmaTT %*% ej/c(t(ej) %*% sigmaTT %*% ej)
+  # p4: (sigmaST %*% ej + HNEE %*% sigmaTT %*% ej)/c(t(ej) %*% sigmaTT %*% ej)
+  # se: Signs of the estimated coefficients for selected variables.
+
 }
 
 

@@ -2,9 +2,10 @@
 # to built later pivot
 
 conditional_dist = function(PQR, joint_distcal, select_E) {
-  # PQR: output of function PQR
-  # joint_distcal: output of function joint_dist
-  # select_E: outcome of variable_selection
+  # Input:
+  # PQR: the result of function PQR
+  # joint_distcal: the result of function joint_dist
+  # select_E: the result of variable_selection (function variable_selection_PY)
   
   OMEGA = select_E[["OMEGA"]] # need to change it when get randomized lasso down
   pnum = PQR[["pnum"]]
@@ -30,15 +31,15 @@ conditional_dist = function(PQR, joint_distcal, select_E) {
     omega = OMEGA
   }
   
-  # conditional distribution of hat{beta}^{lambda}_E, Z_{-E}
+  # conditional distribution of (hat{beta}^{lambda}_E, Z_{-E}) | (hat{beta}_Ej, hat{Gamma}EjPerp)
   delta = -solve(t(Q) %*% solve(omega) %*% Q) %*% t(Q) %*% solve(omega) %*% (R + P %*% rbind(betaEj, GammaEjPerp))
   theta = solve(t(Q) %*% solve(omega) %*% Q)
   
-  # conditional distribution of Z_{-E}
+  # conditional distribution of Z_{-E} | (hat{beta}_Ej, hat{Gamma}EjPerp)
   delta2 = matrix(delta[(Enum+1):pnum,], ncol = 1)
   theta22 = theta[(Enum+1):pnum, (Enum+1):pnum]
   
-  # conditional distribution of hat{beta}^{lambda}_E
+  # conditional distribution of hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E})
   HE = rbind(HEE, HNEE)
   Zero = matrix(0,nrow = Enum, ncol = pnum - Enum)
   lammatrix = diag(rep(lam, pnum - Enum))
@@ -73,4 +74,18 @@ conditional_dist = function(PQR, joint_distcal, select_E) {
               Qn = Qn,
               se = PQR[["se"]],
               n = n,hat_betaE_lambda = hat_betaE_lambda))
+  # Output:
+  # omega: Matrix version of OMEGA (output of function RandomLASSO).
+  # delta: the mean of conditional distribution (hat{beta}^{lambda}_E, Z_{-E}) | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # theta: the variance of conditional distribution (hat{beta}^{lambda}_E, Z_{-E}) | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # delta2: the mean of conditional distribution Z_{-E} | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # theta22: the variance of conditional distribution Z_{-E} | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # HE: the combined vector of HEE and HNEE.
+  # subgradient_unselected: the subgradient vector of unselected variables 
+  # mu: the mean of conditional distribution hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E}).
+  # LAMBDA: the variance of conditional distribution hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E}).
+  # eta: t(HE) %*% solve(omega) %*% rbind(p1, p4) * sqrt(n) (?)
+  # se: Signs of the estimated coefficients for selected variables.
+  # n: # of unique subjects in the dataset.
+  
 }

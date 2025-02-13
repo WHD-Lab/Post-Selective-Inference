@@ -78,11 +78,25 @@ variable_selection_PY = function(data,ID, moderator_formula, lam = NULL, noise_s
   return(list(formula = moderator_formula, E = E, NE = NE, n = n, 
               perturb = perturb, lam = lam, Z = Z, OMEGA = (noise_scale)^2,
               sign_soln = signs[nonzero], soln = soln, postbeta = postbeta,nonzero = nonzero))
+  
+  # Output:
+  # E: Selected variables that remain in the model after penalization.
+  # NE: Non-selected variables that were excluded from the model.
+  # n: Number of unique subjects in the dataset.
+  # perturb: Random noise.
+  # lam: Regularization parameter (lambda) used in the penalization.
+  # Z: Subgradient of unselected variables.
+  # OMEGA: (noise_scale)^2/4.
+  # sign_soln: Signs of the estimated coefficients for selected variables.
+  # soln: Estimated coefficients of selected variables from the penalized regression.
+  # postbeta: True beta projected on space of post-selection predictors.
+  # nonzero: Boolean vector indicating which variables were selected.
 }
 
 ########################################################################################
 
 # This version allow the program penalize the intercept
+
 
 variable_selection_PY_penal_int = function(data,ID, moderator_formula, lam = NULL, noise_scale = NULL, 
                                  splitrat = 0.8, virtualenv_path, ridge_term = 0, beta) {
@@ -120,7 +134,7 @@ variable_selection_PY_penal_int = function(data,ID, moderator_formula, lam = NUL
   
   # load python virtualenv
   require(reticulate)
-  use_virtualenv(virtualenv_path)
+  use_condaenv(condaenv = 'env3', conda = "/opt/anaconda3/bin/conda", required = TRUE)
   # load required modules and functions
   np = import("numpy")
   selectinf = import("selectinf")
@@ -160,5 +174,18 @@ variable_selection_PY_penal_int = function(data,ID, moderator_formula, lam = NUL
   return(list(formula = moderator_formula, E = E, NE = NE, n = n, 
               perturb = perturb/(-2), lam = lam/(-2), Z = Z, OMEGA = (noise_scale)^2/4,
               sign_soln = signs[nonzero], soln = soln, postbeta = postbeta, nonzero = nonzero))
+  
+  # Output:
+  # E: Selected variables that remain in the model after penalization.
+  # NE: Non-selected variables that were excluded from the model.
+  # n: Number of unique subjects in the dataset.
+  # perturb: Random noise.
+  # lam: Regularization parameter (lambda) used in the penalization.
+  # Z: Subgradient of unselected variables.
+  # OMEGA: (noise_scale)^2/4.
+  # sign_soln: Signs of the estimated coefficients for selected variables.
+  # soln: Estimated coefficients of selected variables from the penalized regression.
+  # postbeta: True beta projected on space of post-selection predictors.
+  # nonzero: Boolean vector indicating which variables were selected.
 }
 
