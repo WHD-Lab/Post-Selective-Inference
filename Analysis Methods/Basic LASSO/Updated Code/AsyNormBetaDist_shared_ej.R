@@ -46,6 +46,8 @@ joint_dist_Penal_Int_shared = function(E, NE, pes_outcome, data, id, time) {
   HENE = H(ftStE, ftStNE, wt, "E-E", n)
   sigmaSS = KNENE + HNEE %*% sigmaTT %*% HENE - KNEE %*% solve(HEE) %*% HENE - HNEE %*% solve(HEE) %*% t(KNEE)
 
+  # point estimate betaE
+  betaE = matrix(betaEM[["coefficients"]], ncol = 1)
   
   # betaEperp
   betaEperp = S/(c(sqrt(n))) - sigmaST %*% solve(sigmaTT) %*% betaE
@@ -89,5 +91,69 @@ joint_dist_Penal_Int_ej = function(joint_dist_joint, ej) {
               betaEjperp_cal = list(betaEjperp = betaEjperp, sigma3 = sigma3)))
 
 }
+
+#############################################################################
+H = function(ftStE, ftStNE, wt, type, n) {
+  # type": EE, -EE, E-E
+  
+  if(type == "EE") {return(t(t(ftStE) * c(wt)) %*% t(ftStE)/c(n))}
+  if(type == "-EE") {return(t(t(ftStNE) * c(wt)) %*% t(ftStE)/c(n))}
+  if(type == "E-E") {return(t(t(ftStE) * c(wt)) %*% t(ftStNE)/c(n))}
+}
+
+K = function(ftStE, ftStNE, wt, type, betaEM, n) {
+  # type": EE, -EE, -E-E
+  # betaEM: fitted model for selected predictors
+  
+  require(dplyr)
+  
+  res = betaEM[["residuals"]]
+  wtres_prod = wt * res
+  id = betaEM[["id"]]
+  uniqueID = unique(id)
+  
+  
+  if (type == "EE") {
+    # initialize K
+    K = matrix(0, nrow = dim(ftStE)[1], ncol = dim(ftStE)[1])
+    for(i in uniqueID) {
+      range = which(i == id)
+      select_wtres_prod = wtres_prod[range]
+      ftStE_select = ftStE[,range]
+      innerprod = ftStE_select %*% matrix(select_wtres_prod, ncol = 1) 
+      K = K + innerprod %*% t(innerprod)
+    }
+  }
+  
+  if (type == "-EE") {
+    # initialize K
+    K = matrix(0, nrow = dim(ftStNE)[1], ncol = dim(ftStE)[1])
+    for(i in uniqueID) {
+      range = which(i == id)
+      select_wtres_prod = wtres_prod[range]
+      ftStE_select = ftStE[,range]
+      ftStNE_select = ftStNE[,range]
+      inner1 = ftStNE_select %*% matrix(select_wtres_prod, ncol = 1)
+      inner2 = ftStE_select %*% matrix(select_wtres_prod, ncol = 1)
+      K = K + (inner1 %*% t(inner2))
+    }
+  }
+  
+  if (type == "-E-E") {
+    # initialize K
+    K = matrix(0, nrow = dim(ftStNE)[1], ncol = dim(ftStNE)[1])
+    for(i in uniqueID) {
+      range = which(i == id)
+      select_wtres_prod = wtres_prod[range]
+      ftStNE_select = ftStNE[,range]
+      inner = ftStNE_select %*% matrix(select_wtres_prod, ncol = 1)
+      K = K + inner %*% t(inner)
+    }
+  }
+  
+  return(K/n)
+  
+}
+
 
 
