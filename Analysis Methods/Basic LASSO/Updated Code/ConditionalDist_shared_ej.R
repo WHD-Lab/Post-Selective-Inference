@@ -71,6 +71,6 @@ conditional_dist = function(PQR_shared, PQR_ej, joint_distcal_shared, joint_dist
               eta = eta,
               Aeta = Aeta,
               Qn = Qn,
-              se = PQR[["se"]],
+              se = PQR_shared[["se"]],
               n = n,hat_betaE_lambda = hat_betaE_lambda))
 }
