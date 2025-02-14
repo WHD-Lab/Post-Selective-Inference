@@ -71,7 +71,7 @@ PQR_Pint_ej = function(PQR_Pint_shared, joint_dist_Penal_Int_ej, joint_distcal_s
   # matrix P depends on ej part
   p1 = HEE %*% sigmaTT %*% ej/c(t(ej) %*% sigmaTT %*% ej)
   p4 = (sigmaST %*% ej + HNEE %*% sigmaTT %*% ej)/c(t(ej) %*% sigmaTT %*% ej)
-  P = cbind(rbind(p1 * sqrt(n), p4 * sqrt(n)), P_share)
+  P = cbind(rbind(p1 * sqrt(n), p4 * sqrt(n)), P_shared)
   
   
   return(list(GammaEjPerp = GammaEjPerp,
