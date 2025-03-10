@@ -15,6 +15,23 @@ pesudo_outcome_generator_rf = function(fold, ID, data, Ht, St, At, outcome) {
   return(pesudo)
 }
 
+## Function split simulated data into K folds
+split_data = function(id, fold) {
+  # id: the id column in data set
+  # fold: # of folds hope to split
+  
+  uniID <- unique(id)
+  numPat <- length(uniID)
+  fsize <- floor(numPat/fold)
+  permute_ID <- sample(uniID, size = numPat, replace = F) 
+  fsize_exact <- c(rep(fsize, fold - 1), numPat-(fold - 1)*fsize) 
+  ### incorporating the reaminder if numPat/fold is not whole num
+  fold_labels <- rep(1:fold, fsize_exact)
+  ### split the shuffled ID accroding to the folds
+  fold_indices <- split(permute_ID, fold_labels)
+  return(fold_indices)
+}
+
 ps_random_forest = function(fold_indices, fold, ID, data, Ht, St, At, outcome) {
   # fold_indices: the result of function fold_indMRTSim
   # fold: # of folds hope to split
@@ -71,14 +88,15 @@ ps_random_forest = function(fold_indices, fold, ID, data, Ht, St, At, outcome) {
     data_withpred = rbind(data_withpred, reserve)
     print(data_withpred)
   }
-  data_withpred$ptHtobs = data_withpred[,At]*data_withpred$ptHt_pred_rf + (1-data_withpred[,At])*(1-data_withpred$ptHt_pred_rf)
-  data_withpred$ptStobs = data_withpred[,At]*data_withpred$ptSt_pred_rf + (1-data_withpred[,At])*(1-data_withpred$ptSt_pred_rf)
+  colnames(data_withpred)[ncol(data_withpred)+1 - 5:1] = c("gt_pred_rf","gtAt1_pred_rf","gtAt0_pred_rf", "ptHt", "ptSt")
+  data_withpred$ptHtobs = data_withpred[,At]*data_withpred$ptHt + (1-data_withpred[,At])*(1-data_withpred$ptHt)
+  data_withpred$ptStobs = data_withpred[,At]*data_withpred$ptSt + (1-data_withpred[,At])*(1-data_withpred$ptSt)
   return(data_withpred)
 }
 
 pesudo_outcome_cal_rf = function(data_withpred) {
   At = data_withpred$action
-  ptSt = data_withpred$ptSt_pred_rf
+  ptSt = data_withpred$ptSt
   y = data_withpred$outcome
   gt = data_withpred$gt_pred_rf
   gtAt1 = data_withpred$gtAt1_pred_rf
