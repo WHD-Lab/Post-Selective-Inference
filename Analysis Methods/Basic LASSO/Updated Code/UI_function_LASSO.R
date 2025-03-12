@@ -34,20 +34,20 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_pesu,
   my_formula = as.formula(paste("yDR ~ ", paste(St, collapse = " + ")))
   
   if(is.null(lam) & is.null(noise_scale)) {
-    select = variable_selection_PY_penal_int(ps, ID, my_formula, splitrat=splitrat, virtualenv_path= virtualenv_path, beta)
+    select = variable_selection_PY_penal_int(ps, ID, my_formula, splitrat=splitrat, virtualenv_path= virtualenv_path, beta = beta)
   }
   
   if(!is.null(lam) & is.null(noise_scale)) {
-    select = variable_selection_PY_penal_int(ps, ID, my_formula, lam = lam, splitrat = splitrat, virtualenv_path= virtualenv_path, beta)
+    select = variable_selection_PY_penal_int(ps, ID, my_formula, lam = lam, splitrat = splitrat, virtualenv_path= virtualenv_path, beta = beta)
   }
   
   if(is.null(lam) & !is.null(noise_scale)) {
-    select = variable_selection_PY_penal_int(ps, ID, my_formula, noise_scale = noise_scale, splitrat = splitrat, virtualenv_path= virtualenv_path, beta)
+    select = variable_selection_PY_penal_int(ps, ID, my_formula, noise_scale = noise_scale, splitrat = splitrat, virtualenv_path= virtualenv_path, beta = beta)
   }
   
   if(!is.null(lam) & !is.null(noise_scale)) {
     select = variable_selection_PY_penal_int(ps, ID, my_formula, lam = lam, noise_scale = noise_scale,
-                                             splitrat = splitrat, virtualenv_path= virtualenv_path, beta)
+                                             splitrat = splitrat, virtualenv_path= virtualenv_path, beta = beta)
   }
    
   AsyNormbeta_shared = joint_dist_Penal_Int_shared(E = select$E, NE = select$NE, pes_outcome = "yDR", data = ps, id = ID, time = time)
