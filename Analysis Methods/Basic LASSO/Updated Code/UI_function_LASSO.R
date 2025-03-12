@@ -1,6 +1,6 @@
 # function for basic LASSO DR-WCLS
 
-DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_outcome, method_prop, 
+DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_pesu, 
                                  lam = NULL, noise_scale = NULL, splitrat = 0.8, virtualenv_path, 
                                  beta = NULL, level = 0.9, core_num = NULL){
   # data: raw data without pesudo-outcome, ptSt.
@@ -11,8 +11,8 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_outco
   # St: a vector that contains column names of St variables; St should be a subset of Ht
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
-  # method_outcome: the machines learning method used when generate working model for the outcome i.e. E[Y_{t+1}|H_t, A_t]
-  # method_prop: the machine learning method used when generate working model for two probabilities E[At|Ht] and E[At|St]
+  # method_pesu: the machines learning method used when generate estimates of the nuisance parameters, and those values will be used to calculate the 
+  #             pesudo outcome
   # lam: the value of lambda used to compute beta. If it is not provided, the default value will be used
   # noise_scale: Scale of Gaussian noise added to objective. Default is sqrt((1 - splitrat)/splitrat*NT)*sd(y).
   #             where omega is drawn from IID normals with standard deviation noise_scale
@@ -23,11 +23,11 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_outco
   # level: the CI significant level
   # core_num: the number of cores will be used for parallel calculation
   
-  if(method_outcome == "LASSO" & method_prop == "LASSO") {
-    ps = pesudo_outcome_generator(fold, ID, data, Ht, St, At, outcome)
+  if(method_pesu == "CVLASSO") {
+    ps = pesudo_outcome_generator_CVlasso(fold, ID, data, Ht, St, At, outcome, core_num)
   }
   
-  my_formula = as.formula(paste("yDR ~ ", paste(paste0("state",1:25), collapse = " + ")))
+  my_formula = as.formula(paste("yDR ~ ", paste(St, collapse = " + ")))
   
   if(is.null(lam) & is.null(noise_scale)) {
     select = variable_selection_PY_penal_int(ps, ID, my_formula, splitrat=splitrat, virtualenv_path= virtualenv_path, beta)
@@ -78,7 +78,7 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_outco
   # Filter the list to keep only the function names (not variables)
   function_names <- all_functions[sapply(all_functions, function(x) is.function(get(x)))]
   
-  clusterExport(cl, varlist = function_names, envir = .GlobalEnv)
+  clusterExport(cl, varlist = function_names, envir = environment())
   # do parallel calculation
   results = parLapply(cl, ejs, CI_per_select_var)
   
