@@ -1,7 +1,7 @@
 # Generate Pesudo-outcome DR-WCLS version
 
 ################# Main Function #########################
-pesudo_outcome_generator = function(fold, ID, data, Ht, St, At, outcome, core_num = NULL) {
+pesudo_outcome_generator_CVlasso = function(fold, ID, data, Ht, St, At, outcome, core_num = NULL) {
   # fold: # of folds hope to split
   # ID: the name of column where participants' ID are stored
   # data: simulated dataset
