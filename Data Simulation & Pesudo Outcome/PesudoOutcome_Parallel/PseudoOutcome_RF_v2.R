@@ -1,5 +1,5 @@
 # Run random forest to train working model
-pesudo_outcome_generator_rf_v2 = function(fold, ID, data, Ht, St, At, outcome) {
+pesudo_outcome_generator_rf_v2 = function(fold, ID, data, Ht, St, At, outcome, core_num = NULL) {
   # fold: # of folds hope to split
   # ID: the name of column where participants' ID are stored
   # data: simulated dataset
@@ -7,32 +7,16 @@ pesudo_outcome_generator_rf_v2 = function(fold, ID, data, Ht, St, At, outcome) {
   # St: a vector that contains column names of St variables; St should be a subset of Ht
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
+  # core_num: number of cores will be used for calculation
   
   fold_ind = split_data(data[,ID], fold = fold)
   MRT_rf = ps_random_forest_v2(fold_indices = fold_ind, fold = fold, ID = ID, 
-                               data = data, Ht = Ht, St = St, At = At, outcome = outcome)
+                               data = data, Ht = Ht, St = St, At = At, outcome = outcome, core_num)
   pesudo = pesudo_outcome_cal_rf_v2(MRT_rf)
   return(pesudo)
 }
 
-## Function split simulated data into K folds
-split_data = function(id, fold) {
-  # id: the id column in data set
-  # fold: # of folds hope to split
-  
-  uniID <- unique(id)
-  numPat <- length(uniID)
-  fsize <- floor(numPat/fold)
-  permute_ID <- sample(uniID, size = numPat, replace = F) 
-  fsize_exact <- c(rep(fsize, fold - 1), numPat-(fold - 1)*fsize) 
-  ### incorporating the reaminder if numPat/fold is not whole num
-  fold_labels <- rep(1:fold, fsize_exact)
-  ### split the shuffled ID accroding to the folds
-  fold_indices <- split(permute_ID, fold_labels)
-  return(fold_indices)
-}
-
-ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome) {
+ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome, core_num = NULL) {
   # fold_indices: the result of function fold_indMRTSim
   # fold: # of folds hope to split
   # ID: the name of column where participants' ID are stored
@@ -41,21 +25,20 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
   # St: a vector that contains column names of St variables; St should be a subset of Ht
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
-  
-  require(ranger)
-  require(tidyverse)
+  # core_num: number of cores will be used for calculation
   
   data_withpred = data.frame()
   
-  for(i in 1:fold) {
-    print(i)
+  expectation_cal = function(i) {
+    require(ranger)
+    require(tidyverse)
+    
+    # print(i)
     reserve = data[(data[,ID] %in% fold_indices[[i]]), ]
     train_fold = data[!(data[,ID] %in% fold_indices[[i]]), ]
     
     ## gt(Ht,At)
     X_test = reserve[, c(Ht, At)]
-    X_train = train_fold[, c(Ht, At)]
-    y_train = train_fold[, outcome]
     gt_rf = ranger(formula = as.formula(paste(outcome, "~", paste(c(Ht, At), collapse = " + "))), 
                    data = train_fold, 
                    num.trees = 500)
@@ -72,9 +55,6 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
     reserve$gtAt0_pred_rf = predict(gt_rf, data = X_testfixAt0)$predictions
     
     ## E[At|Ht]
-    X_testHt = X_test[,Ht] #remove true action
-    X_trainHt = X_train[,Ht]
-    y_trainAt = as.factor(train_fold[,At])
     ptHt_rf = ranger(formula = as.formula(paste(At, "~", paste(Ht, collapse = " + "))), 
                      data = train_fold, 
                      num.trees = 500, 
@@ -82,9 +62,6 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
     reserve$ptHt_pred_rf = predict(ptHt_rf, data = reserve)$predictions[, 2]  
     
     ## E[At|St]
-    X_testSt = X_testHt[,St]
-    X_trainSt = X_trainHt[,St]
-    
     ptSt_rf = ranger(formula = as.formula(paste(At, "~", paste(St, collapse = " + "))), 
                      data = train_fold, 
                      num.trees = 500, 
@@ -92,9 +69,28 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
     
     reserve$ptSt_pred_rf = predict(ptSt_rf, data = reserve)$predictions[, 2]
     
-    data_withpred = rbind(data_withpred, reserve)
-    print(data_withpred)
+    return(reserve)
   }
+  
+  ################## do it parallel
+  require(parallel)
+  
+  folds_list = 1:fold
+  
+  if(is.null(core_num)) {cl = makeCluster(core_num)} else {cl = makeCluster(detectCores())}
+  
+  var_names = ls(envir= environment())
+  
+  clusterExport(cl, varlist = c(var_names, "expit"), envir = environment())
+  
+  results = parLapply(cl, folds_list, expectation_cal)
+  
+  stopCluster(cl)
+  
+  for(i in folds_list) {
+    data_withpred = rbind(data_withpred, results[[i]])
+  }
+  ###########################
   
   colnames(data_withpred)[ncol(data_withpred)+1 - 5:1] = c("gt_pred_rf","gtAt1_pred_rf","gtAt0_pred_rf", "ptHt", "ptSt")
   data_withpred$ptHtobs = data_withpred[,At]*data_withpred$ptHt + (1-data_withpred[,At])*(1-data_withpred$ptHt)
@@ -114,7 +110,7 @@ pesudo_outcome_cal_rf_v2 = function(data_withpred) {
   # wt = data_withpred$ptStobs/data_withpred$ptHtobs
   wt = data_withpred$ptStobs/(data_withpred$prob*At + (1-data_withpred$prob)* (1-At))
   
-  data_withpred$yDR_rf = wt*(At - ptSt)*(y - gt)/(ptSt * (1-ptSt)) + (gtAt1 - gtAt0)
-  print(data_withpred$yDR_rf)
+  data_withpred$yDR = wt*(At - ptSt)*(y - gt)/(ptSt * (1-ptSt)) + (gtAt1 - gtAt0)
+  # print(data_withpred$yDR)
   return(data_withpred)
 }
