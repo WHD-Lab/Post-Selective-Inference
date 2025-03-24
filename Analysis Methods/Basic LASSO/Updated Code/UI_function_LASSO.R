@@ -1,5 +1,16 @@
 # function for basic LASSO DR-WCLS
 
+########################## manually source files that will be used########################
+# you might need to manually change it.
+source("./Data Simulation & Pesudo Outcome/Data Simulation.R")
+source("./Data Simulation & Pesudo Outcome/PesudoOutcome_Parallel/PesudoOutcome_Generation_CVlasso.R")
+source("./Data Simulation & Pesudo Outcome/PesudoOutcome_Parallel/PseudoOutcome_RF_v2.R")
+source("./Analysis Methods/Basic LASSO/RandomLASSO_subgrad_Py.R")
+source("./Analysis Methods/Basic LASSO/Updated Code/AsyNormBetaDist_shared_ej.R")
+source("./Analysis Methods/Basic LASSO/Updated Code/PQR_shared_ej.R")
+source("./Analysis Methods/Basic LASSO/Updated Code/ConditionalDist_shared_ej.R")
+source("./Analysis Methods/Basic LASSO/Updated Code/LASSO_Dynamic_CI_Search.R")
+
 DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_pesu, 
                                  lam = NULL, noise_scale = NULL, splitrat = 0.8, virtualenv_path, 
                                  beta = NULL, level = 0.9, core_num = NULL){
@@ -7,13 +18,13 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_pesu,
   # fold: # of folds hope to split when generating pesudo outcome
   # ID: the name of column where participants' ID are stored
   # time: the name of column where time in study are stored
-  # Ht: a vector that contains column names of Ht variables
-  # St: a vector that contains column names of St variables; St should be a subset of Ht
+  # Ht: a vector that contains column names of control variables
+  # St: a vector that contains column names of moderator variables; St should be a subset of Ht
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
   # method_pesu: the machines learning method used when generate estimates of the nuisance parameters, and those values will be used to calculate the 
   #             pesudo outcome
-  # lam: the value of lambda used to compute beta. If it is not provided, the default value will be used
+  # lam: the value of penalty term of randomized LASSO. If it is not provided, the default value will be used
   # noise_scale: Scale of Gaussian noise added to objective. Default is sqrt((1 - splitrat)/splitrat*NT)*sd(y).
   #             where omega is drawn from IID normals with standard deviation noise_scale
   # splitrat: the corresponding to the data splitting rate. Details can read "Exact Selective Inference with Randomization" page 15 equation (10).
@@ -103,6 +114,19 @@ DR_WCLS_LASSO = function(data, fold, ID, time, Ht, St, At, outcome, method_pesu,
   for(i in 1:length(results)) {final_results[i,] = unlist(results[[i]])}
   
   return(final_results)
+  
+  # Output:
+  # A table
+  # E: the selected variables for which CI is calculated
+  # GEE_est: the GEE estimate for this predictor
+  # post_beta: the post selection true value for this predictor if simulation is conducted. Otherwise, NA is provided.
+  # pvalue: the p value
+  # lowCI: the lower bound of the confidence interval
+  # upperCI: the upper bound of the confidence interval
+  # prop_low: the true corresponding pivot value for the lower bound. For example, if it's 90% CI, this 
+  #          value will close to 0.05
+  # prop_up: the true corresponding pivot value for the upper bound. For example, if it's 90% CI, this 
+  #          value will close to 0.95
 }
 
 
