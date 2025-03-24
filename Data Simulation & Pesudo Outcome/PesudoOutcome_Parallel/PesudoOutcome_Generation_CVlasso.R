@@ -4,12 +4,18 @@
 pesudo_outcome_generator_CVlasso = function(fold, ID, data, Ht, St, At, outcome, core_num = NULL) {
   # fold: # of folds hope to split
   # ID: the name of column where participants' ID are stored
-  # data: simulated dataset
-  # Ht: a vector that contains column names of Ht variables
-  # St: a vector that contains column names of St variables; St should be a subset of Ht
+  # data: dataset name
+  # Ht: a vector that contains column names of control variables
+  # St: a vector that contains column names of moderator variables; St should be a subset of Ht
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
   # core_num: number of cores will be used for calculation
+  
+  # Output
+  # This function returns a dataset with pseudo outcome. It will call function split_data to generate folds.
+  # Then call function simple_lasso to train CV LASSO on these folds to obtain estimates that will be used for 
+  # pesudo outcome calculation. Then the last function will be called is pesudo_outcomecal, and a 
+  # column with name "yDR" will be generated.
   
   fold_ind = split_data(data[,ID], fold = fold)
   MRT_sim_lasso = simple_lasso(fold_indices = fold_ind, fold = fold, ID = ID, data = data,
@@ -55,6 +61,10 @@ simple_lasso = function(fold_indices, fold, ID, data, Ht, St, At, outcome, core_
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
   # core_num: number of cores will be used for calculation
+  
+  # Output
+  # this function use CV LASSO to train model on folds and provide estimates that will be used for later 
+  # pseudo outcome calculation
 
   
   data_withpred <- data.frame()
@@ -153,9 +163,16 @@ simple_lasso = function(fold_indices, fold, ID, data, Ht, St, At, outcome, core_
   
   
   return(list(data_withpred, varselect_gt, varselect_ptHt, varselect_ptSt))
+  
 }
 
 pesudo_outcomecal = function(data_withpred) {
+  # Input:
+  # the outcome of function simple_lasso
+  
+  # Output:
+  # produce dataset that contains a new column "yDR". This is the pseudo outcome we hope to get
+  
   At = data_withpred$action
   ptSt = data_withpred$ptSt
   y = data_withpred$outcome

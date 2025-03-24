@@ -9,6 +9,12 @@ pesudo_outcome_generator_rf_v2 = function(fold, ID, data, Ht, St, At, outcome, c
   # outcome: column names of outcome variable
   # core_num: number of cores will be used for calculation
   
+  # Output
+  # This function returns a dataset with pseudo outcome. It will call function split_data to generate folds.
+  # Then call function ps_random_forest_v2 to train Random Forest on these folds to obtain estimates that will be used for 
+  # pesudo outcome calculation. Then the last function will be called is pesudo_outcome_cal_rf_v2, and a 
+  # column with name "yDR" will be generated.
+  
   fold_ind = split_data(data[,ID], fold = fold)
   MRT_rf = ps_random_forest_v2(fold_indices = fold_ind, fold = fold, ID = ID, 
                                data = data, Ht = Ht, St = St, At = At, outcome = outcome, core_num)
@@ -26,6 +32,11 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
   # At: column names of treatment (At)
   # outcome: column names of outcome variable
   # core_num: number of cores will be used for calculation
+  
+  # Output
+  # this function use Random Forest to train model on folds and provide estimates that will be used for later 
+  # pseudo outcome calculation
+  
   
   data_withpred = data.frame()
   
@@ -99,6 +110,12 @@ ps_random_forest_v2 = function(fold_indices, fold, ID, data, Ht, St, At, outcome
 }
 
 pesudo_outcome_cal_rf_v2 = function(data_withpred) {
+  # Input:
+  # the outcome of function ps_random_forest_v2
+  
+  # Output:
+  # produce dataset that contains a new column "yDR". This is the pseudo outcome we hope to get
+  
   At = data_withpred$action
   ptSt = data_withpred$ptSt
   y = data_withpred$outcome
