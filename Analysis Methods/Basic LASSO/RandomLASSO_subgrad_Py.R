@@ -84,10 +84,10 @@ variable_selection_PY_penal_int = function(data,ID, moderator_formula, lam = NUL
   # E: Selected variables that remain in the model after penalization.
   # NE: Non-selected variables that were excluded from the model.
   # n: Number of unique subjects in the dataset.
-  # perturb: Random noise.
+  # perturb: Random noise added for each variables.
   # lam: Regularization parameter (lambda) used in the penalization.
   # Z: Subgradient of unselected variables.
-  # OMEGA: (noise_scale)^2/4.
+  # OMEGA: (noise_scale)^2/4. Divide 4 because in theoretical calculation -1/2 is hidden inside penalty and random noise
   # sign_soln: Signs of the estimated coefficients for selected variables.
   # soln: Estimated coefficients of selected variables from the penalized regression.
   # postbeta: True beta projected on space of post-selection predictors.
