@@ -65,6 +65,19 @@ joint_dist_Penal_Int_shared = function(E, NE, pes_outcome, data, id, time) {
               E = E,
               NE = NE
   ))
+  
+  # Output:
+  # wt: ptSt * (1 - ptSt).
+  # betaEM: fitted model for selected predictors.
+  # S: ftStNE %*% residuals * wt / sqrt(n).
+  # ej: The j-th standard basis vector, used to extract a specific coefficient estimate from betaE.
+  # H: HEE, HNEE, HENE.
+  # K: KEE, KNEE, KNENE.
+  # Sigma: sigmaTT, sigmaST, sigmaSS.
+  # betaEperp_cal: betaEperp (orthogonal to betaE); sigma2 (Variance of betaEperp).
+  # n: # of unique subjects in the dataset.
+  # E: selected predictors.
+  # NE: unselected predictors.
 }
 
 joint_dist_Penal_Int_ej = function(joint_dist_joint, ej) {
@@ -89,6 +102,11 @@ joint_dist_Penal_Int_ej = function(joint_dist_joint, ej) {
   return(list(ej = ej,
               betaEj_cal = list(betaEj = betaEj, sigmasq1 = sigmasq1),
               betaEjperp_cal = list(betaEjperp = betaEjperp, sigma3 = sigma3)))
+  
+  # Output:
+  # ej: The j-th standard basis vector, used to extract a specific coefficient estimate from betaE.
+  # betaEj_cal: The estimated betaEj and the variance of betaEj.
+  # betaEjperp_cal: betaEjperp (orthogonal to betaEj) ; sigma3 (Variance of betaEjperp).
 
 }
 
@@ -99,6 +117,9 @@ H = function(ftStE, ftStNE, wt, type, n) {
   if(type == "EE") {return(t(t(ftStE) * c(wt)) %*% t(ftStE)/c(n))}
   if(type == "-EE") {return(t(t(ftStNE) * c(wt)) %*% t(ftStE)/c(n))}
   if(type == "E-E") {return(t(t(ftStE) * c(wt)) %*% t(ftStNE)/c(n))}
+  
+  # Output:
+  # H matrix that will be used in asymptotic normality for betas
 }
 
 K = function(ftStE, ftStNE, wt, type, betaEM, n) {
@@ -153,6 +174,8 @@ K = function(ftStE, ftStNE, wt, type, betaEM, n) {
   
   return(K/n)
   
+  # Output:
+  # K matrix that will be used in asymptotic normality for betas
 }
 
 

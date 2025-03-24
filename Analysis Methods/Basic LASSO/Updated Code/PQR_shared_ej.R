@@ -1,5 +1,6 @@
 PQR_Pint_shared = function(joint_distcal_shared, select_E) {
   # joint_distcal_shared: the result of function joint_dist
+  # select_E: the result of function variable_selection_PY_penal_int
   
   HEE = joint_distcal_shared[["H"]][["HEE"]]
   HNEE = joint_distcal_shared[["H"]][["HNEE"]]
@@ -51,6 +52,16 @@ PQR_Pint_shared = function(joint_distcal_shared, select_E) {
               NEnum = NEnum, # number of unselected parameters
               pnum = pnum, # number of all potential parameters
               se = se))
+  
+  # Output:
+  # P_share: the part of P matrix that will not change with ej value
+  # Q: Q matrix
+  # R: R matrix
+  # Enum: number of selected parameters
+  # NEnum: number of unselected parameters
+  # pnum: number of all potential parameters
+  # se: Signs of the estimated coefficients for selected variables.
+
 }
 
 PQR_Pint_ej = function(PQR_Pint_shared, joint_dist_Penal_Int_ej, joint_distcal_shared) {
@@ -78,5 +89,10 @@ PQR_Pint_ej = function(PQR_Pint_shared, joint_dist_Penal_Int_ej, joint_distcal_s
               p1 = p1* sqrt(n),
               p4 = p4* sqrt(n),
               P = P))
+  # Output:
+  # GammaEjPerp: the GammaEjPerp matrix
+  # p1: the 1st block of P matrix. This value will be used to calculate eta
+  # p4: the 4st block of P matrix. This value will be used to calculate eta
+  # P: the P matrix
 }
 

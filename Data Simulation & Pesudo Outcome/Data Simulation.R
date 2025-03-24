@@ -3,9 +3,24 @@
 ## generate_dataset: simulates data for all participants
 
 generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_rand = 0.5, rho, beta_logit, model, beta, theta1) {
+  # id: the assigned id for this specific individual
+  # T: the number of observations for this individual
+  # P: the number of measurements or predictors
+  # sigma_residual: the noise added to the moderator formula when generate pesudo outcome. This noise is 
+  #                 generated using ARIMA
+  # sigma_randint: the noise added to the moderator formula when generate pesudo outcome.
+  # main_rand: the noise added to the control formula when generate pesudo outcome. This noise is generated using ARIMA
+  # rho: this value is used to simulate state or predictors. We also use ARIMA when generating predictors, and
+  #      rho defines how much of the past values influence the current value in an autoregressive model
+  # beta_logit: the true value of beta when simulate the probability of assign treatment p(At = 1|Ht)
+  # model: the true model for moderator when generate pesudo outcomes
+  # beta: the true coefficients for moderator
+  # theta1: the coefficients for the working model of control variables. For now, we just simply assume the working model
+  #       contains the all predictors with coefficients equal to theta1
+  
   ## Input: id, T, P (Dimension of state matrix), sigma_residual, sigma_randint, main_rand, rho (Correlation between time points), beta_logit, model, beta, theta1
   ## Function: Generates an individual with T time points, including state (S_t), action (A_t), and outcome (Y_{t+1}) using ARIMA for states and logistic regression for actions.
-  ## Output: A data frame containing the generated states S_t, action A_t, outcomes Y_{t+1}, treatment effects, and noise components.
+  ## Output: A data frame containing the generated states S_t, action A_t, outcomes Y_{t+1}, treatment effects, and noise components for a single participant.
   
   ## Order of generation: 
   ## (1) generate state S_t: VAR only depend on state
@@ -55,6 +70,22 @@ generate_individual <- function(id=1, T, P, sigma_residual, sigma_randint, main_
 
 
 generate_dataset <- function(N, T, P, sigma_residual, sigma_randint, main_rand = 0.5, rho, beta_logit, model, beta, theta1) {
+  # N: the number of participants you hope to simulate
+  # T: how many observations per participant
+  # P: how many predictors to simulate
+  # sigma_residual: the noise added to the moderator formula when generate pesudo outcome. This noise is 
+  #                 generated using ARIMA
+  # sigma_randint: the noise added to the moderator formula when generate pesudo outcome.
+  # main_rand: the noise added to the control formula when generate pesudo outcome. This noise is generated using ARIMA
+  # rho: this value is used to simulate state or predictors. We also use ARIMA when generating predictors, and
+  #      rho defines how much of the past values influence the current value in an autoregressive model
+  # beta_logit: the true value of beta when simulate the probability of assign treatment p(At = 1|Ht)
+  # model: the true model for moderator when generate pesudo outcomes
+  # beta: the true coefficients for moderator
+  # theta1: the coefficients for the working model of control variables. For now, we just simply assume the working model
+  #       contains the all predictors with coefficients equal to theta1
+  
+  
   MRT_data = rep(0,0)
   for(n in 1:N) {
     fake_individual = generate_individual(n, T, P, sigma_residual, sigma_randint, main_rand, rho, beta_logit, model, beta, theta1)  
@@ -63,6 +94,7 @@ generate_dataset <- function(N, T, P, sigma_residual, sigma_randint, main_rand =
   return(MRT_data)
   # Output:
   # ID (1:N), Decision_point (1:T), state1 - stateP, prob, action, outcome (observed Y), signal (treatment_effect), noise
+  # A large longitudinal dataset that contain records for N participants
 }
 
 

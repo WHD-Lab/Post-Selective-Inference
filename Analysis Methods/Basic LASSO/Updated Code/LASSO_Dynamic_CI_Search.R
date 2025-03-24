@@ -5,6 +5,15 @@
 
 # This calculate the I-n, I+n. Details can be found at the beginning of page 9
 support_update = function(se, eta, LAMBDA, Aeta, Qn) {
+  # Input:
+  # se: the sign solution of selected variables
+  # eta: the updated eta value
+  # LAMBDA: the updated variance of conditional distribution hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E}).
+  # Aeta: the updated value of Aeta
+  # Qn: the updated value of Qn
+  
+  # Output:
+  # the lower and upper bounds for inner integration
   
   diagSe = diag(se)
   
@@ -12,9 +21,6 @@ support_update = function(se, eta, LAMBDA, Aeta, Qn) {
   upperbond = Inf
   
   for(i in 1:length(se)) {
-    # warning: I manually set i starts from 2 to skip intercept
-    # Because we lack se and point estimate for intercept from randomized lasso
-    # to avoid manipulated value impact later result I skip it
     
     frac = (t(diagSe[,i]) %*% Aeta)/(-t(diagSe[,i]) %*% Qn)
     
@@ -36,12 +42,18 @@ support_update = function(se, eta, LAMBDA, Aeta, Qn) {
 # when intercept is penalized
 pivot_split_update = function(PQR_shared, PQR_ej, cond_dist, joint_distcal_shared, joint_distcal_ej, select_E, level = 0.9, pes_outcome, data,
                               id, time) {
-  # temp_support: result of function support
-  # PQR: result of function PQR
+  # PQR_shared: result of function PQR_Pint_shared
+  # PQR_ej: result of function PQR_Pint_ej
   # cond_dist: result of function conditional_dist
   # joint_distcal_shared: result of function joint_dist_Penal_Int_shared
   # joint_distcal_ej: result of function joint_dist_Penal_Int_ej
-  # level: the significant level
+  # select_E: result of function variable_selection_PY_penal_int
+  # level: the significant level of confidence interval
+  # pes_outcome: the column names of pseudo outcome
+  # data: the dataset with pseudo outcome
+  # id: column names of participant id
+  # time: column names of decidion time points
+  
   
   E = select_E[["E"]]
   NE = select_E[["NE"]]
@@ -280,12 +292,21 @@ pivot_split_update = function(PQR_shared, PQR_ej, cond_dist, joint_distcal_share
               prop_up = CI$prop_up
   ))
   
+  # Output:
+  # E: the selected variables for which CI is calculated
+  # GEE_est: the GEE estimate for this predictor
+  # post_beta: the post selection true value for this predictor if simulation is conducted
+  # pvalue: the p value
+  # lowCI: the lower bound of the confidence interval
+  # upperCI: the upper bound of the confidence interval
+  # prop_low: the true corresponding pivot value for the lower bound. For example, if it's 90% CI, this 
+  #          value will close to 0.05
+  # prop_up: the true corresponding pivot value for the upper bound. For example, if it's 90% CI, this 
+  #          value will close to 0.95
 }
 
 #######################################################
-# If I don't simply consider under hypothesis beta_E,j = b, will
-# only change the way I calculate mu_final. Instead I recalculate
-# all previous values under this hypothesis value.
+# I recalculate all previous values under this hypothesis value beta_E,j = b.
 
 # step 1. Get an estimate for the theoretical beta value under
 # the hypothesis

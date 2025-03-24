@@ -2,9 +2,11 @@
 # to built later pivot
 
 conditional_dist = function(PQR_shared, PQR_ej, joint_distcal_shared, joint_distcal_ej, select_E) {
-  # PQR: output of function PQR
-  # joint_distcal: output of function joint_dist
-  # select_E: outcome of variable_selection
+  # PQR_shared: output of function PQR_Pint_shared
+  # PQR_ej: output of function PQR_Pint_ej
+  # joint_distcal_shared: output of function joint_dist_Penal_Int_shared
+  # joint_distcal_ej: output of function joint_dist_Penal_Int_ej
+  # select_E: output of function variable_selection_PY_penal_int
   
   OMEGA = select_E[["OMEGA"]] # need to change it when get randomized lasso down
   pnum = PQR_shared[["pnum"]]
@@ -73,4 +75,17 @@ conditional_dist = function(PQR_shared, PQR_ej, joint_distcal_shared, joint_dist
               Qn = Qn,
               se = PQR_shared[["se"]],
               n = n,hat_betaE_lambda = hat_betaE_lambda))
+  # Output:
+  # omega: Matrix version of OMEGA. It the variance of added random noised.
+  # delta: the mean of conditional distribution (hat{beta}^{lambda}_E, Z_{-E}) | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # theta: the variance of conditional distribution (hat{beta}^{lambda}_E, Z_{-E}) | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # delta2: the mean of conditional distribution Z_{-E} | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # theta22: the variance of conditional distribution Z_{-E} | (hat{beta}_Ej, hat{Gamma}EjPerp).
+  # HE: the combined vector of HEE and HNEE.
+  # subgradient_unselected: the subgradient vector of unselected variables 
+  # mu: the mean of conditional distribution hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E}).
+  # LAMBDA: the variance of conditional distribution hat{beta}^{lambda}_E | (hat{beta}_Ej, hat{Gamma}EjPerp, Z_{-E}).
+  # eta: the specifically designed vector that will be used to reduce integration dimension when calculate pivot
+  # se: Signs of the estimated coefficients for selected variables.
+  # n: # of unique subjects in the dataset.
 }
