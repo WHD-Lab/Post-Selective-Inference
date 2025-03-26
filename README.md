@@ -21,7 +21,15 @@ This folder stores function corresponding to data simulation and pesudo-outcome 
 
 1. Install pipx
 
+```
+python -m pip install --user pipx
+```
+
 2. In command line type: ``pipx ensurepath``
+
+```
+python -m pipx ensurepath
+```
 
 3. open new terminal (so that path changes take effect)
 
