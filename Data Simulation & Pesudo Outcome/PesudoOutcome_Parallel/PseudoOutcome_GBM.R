@@ -41,9 +41,7 @@ ps_gradient_boosting = function(fold_indices, fold, ID, data, Ht, St, At, outcom
     
     reserve$ptHt_pred_gbm = predict(ptHt_gbm, xgb.DMatrix(as.matrix(reserve[, Ht])))     
     reserve$ptSt_pred_gbm = predict(ptSt_gbm, xgb.DMatrix(as.matrix(reserve[, St])))      
-    
-    reserve$ptHt_pred_gbm = pmax(pmin(reserve$ptHt_pred_gbm, 1), 0)     
-    reserve$ptSt_pred_gbm = pmax(pmin(reserve$ptSt_pred_gbm, 1), 0)       
+          
     
     return(reserve)   
   }    
