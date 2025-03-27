@@ -52,6 +52,8 @@ pip install wheel
 python setup.py bdist_wheel 
 ```
 
+Sometimes you need to install c++
+
 10. In the command type: ``pip install -e . -r requirements.txt -r dev-requirements.txt``.This will gives a error “The 'sklearn' PyPI package is deprecated, use 'scikit-learn' rather than 'sklearn' for pip commands.” This can be fixed by opening the file called “requirements” in downloaded selective-inference folder. Find sklearn replacing it with scikit-learn
 
 - ### Mac
