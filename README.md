@@ -41,7 +41,7 @@ python -m pipx ensurepath
 
 6. Init and populate submodules: ``git submodule update --init``
 
-7. Don’t use the latest version of Python it will not work. Use the older version. Create a new python3 virtual environment: ``virtualenv env3 -p python3.9``
+7. Don’t use the latest version of Python it will not work. Use the older version. Create a new python3 virtual environment: ``virtualenv env3 -p python3.9`` **Make sure you have virtualenv installed, and it's installed in python3.9 environment**
 
 8.	Active the environment: ``env3/Scripts/activate`` If it doesn’t work try ``env3\Scripts\activate``
 
@@ -68,7 +68,7 @@ python -m pipx ensurepath
 
 6. Init and populate submodules: ``git submodule update --init``
 
-7. Create a new python3 virtual environment: virtualenv env3 -p python3.9
+7. Create a new python3 virtual environment: ``virtualenv env3 -p python3.9`` **Make sure you have virtualenv installed, and it's installed in python3.9 environment**
 
 8. Active the environment: ``source env3/bin/activate``
 
