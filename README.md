@@ -45,7 +45,12 @@ python -m pipx ensurepath
 
 8.	Active the environment: ``env3/Scripts/activate`` If it doesn’t work try ``env3\Scripts\activate``
 
-9. In the command type: ``pip install git+https://github.com/regreg/regreg.git``. This step will tend to fail, and it will ask you to install some uninstalled packages like Cython, numpy. Make sure you use ``pip install numpy==1.22.4`` for numpy. Otherwise, you will get error message “module 'numpy' has no attribute 'asscalar'” when run the code.
+9. In the command type: ``pip install git+https://github.com/regreg/regreg.git``. This step will tend to fail, and it will ask you to install some uninstalled packages like Cython, numpy. Make sure you use ``pip install numpy==1.22.4`` for numpy. Otherwise, you will get error message “module 'numpy' has no attribute 'asscalar'” when run the code.If you encounter error: ```python setup.py bdist_wheel did not run successfully```. Run below code
+
+```
+pip install wheel
+python setup.py bdist_wheel 
+```
 
 10. In the command type: ``pip install -e . -r requirements.txt -r dev-requirements.txt``.This will gives a error “The 'sklearn' PyPI package is deprecated, use 'scikit-learn' rather than 'sklearn' for pip commands.” This can be fixed by opening the file called “requirements” in downloaded selective-inference folder. Find sklearn replacing it with scikit-learn
 
@@ -97,7 +102,7 @@ use_condaenv(condaenv = 'env3', conda = "path to anaconda3/bin/conda", required 
 
 ### Simulate data and test the code
 
-**Make sure you source file ``source("./Analysis Methods/Basic LASSO/Updated Code/UI_function_LASSO.R")`` before run any of the following code**
+**Make sure you set R working directory to ```setwd("/path/to/Post-Selective-Inference-Lab")```. Then source file ``source("./Analysis Methods/Basic LASSO/Updated Code/UI_function_LASSO.R")`` before run any of the following code**
 
 - #### Simulate data
 
