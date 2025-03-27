@@ -43,7 +43,7 @@ python -m pipx ensurepath
 
 7. Don’t use the latest version of Python it will not work. Use the older version. Create a new python3 virtual environment: ``virtualenv env3 -p python3.9``
 
-8.	Active the environment: ``env3/Scripts/activate`` If it doesn’t work try ``env3/Scripts/activate``
+8.	Active the environment: ``env3/Scripts/activate`` If it doesn’t work try ``env3\Scripts\activate``
 
 9. In the command type: ``pip install git+https://github.com/regreg/regreg.git``. This step will tend to fail, and it will ask you to install some uninstalled packages like Cython, numpy. Make sure you use ``pip install numpy==1.22.4`` for numpy. Otherwise, you will get error message “module 'numpy' has no attribute 'asscalar'” when run the code.
 
